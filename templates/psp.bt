@@ -18,7 +18,7 @@ struct FILE {
             } else {
                 length = header.resource[i+1] - header.resource[i];
             }
-            FSeek(header.resource[0]);
+            FSeek(header.resource[i]);
             struct RESOURCE {
                 char resource[length];
             } resource <optimize=false>;
