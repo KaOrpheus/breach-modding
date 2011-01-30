@@ -1,0 +1,39 @@
+//--------------------------------------
+//--- 010 Editor v3.1.3 Binary Template
+//
+// File: dar.bt
+// Author: Mike
+// Purpose: Label breach .dar archive files
+// Notes: Current data length hardcoded for debug.dar
+//--------------------------------------
+struct STRING {
+    int len;
+    char s[len];
+};
+
+struct ARCHIVE {
+    struct HEADER {
+        char magic[4];
+        int version;
+        int directory_offset <format=hex>;
+        int data_offset_relative <format=hex>;
+        int data_offset <format=hex>;
+        unsigned int file_length <format=hex>;
+    } header;
+    FSeek(header.directory_offset);
+/*
+ *  Directory entries here.
+ *  Haven't worked out a pattern yet
+ */
+    FSeek(header.data_offset);
+    int offset <format=hex>;
+    FSeek(header.data_offset);
+    FSkip(offset);
+    int pad;
+    struct DATA {
+        struct FILE {
+            int length;
+            char data[length];
+        } file[13] <optimize=false>;
+    } data;
+} archive;
