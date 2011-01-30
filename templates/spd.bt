@@ -1,0 +1,16 @@
+//--------------------------------------
+//--- 010 Editor v3.1.3 Binary Template
+//
+// File: spd.bt
+// Author: Mike
+// Purpose: Label Breach .spd files
+//--------------------------------------
+BigEndian();
+struct FILE {
+    struct HEADER {
+        char magic[8];
+        int pad; /* Always 0x2C */
+        int pad; /* Always 0 */
+        unsigned int resource_count;
+    } header;
+} file;
