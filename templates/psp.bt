@@ -1,0 +1,27 @@
+//--------------------------------------
+//--- 010 Editor v3.1.3 Binary Template
+//
+// File: psp.bt
+// Author: Mike
+// Purpose: Label Breach .psp files
+//--------------------------------------
+struct FILE {
+    struct HEADER {
+        unsigned int resource_count;
+        unsigned int resource[resource_count];
+    } header;
+    struct RESOURCES {
+        local int i, length;
+        for (i = 0; i < header.resource_count; i++) {
+            if (i == header.resource_count - 1) {
+                length = FileSize() - header.resource[i];
+            } else {
+                length = header.resource[i+1] - header.resource[i];
+            }
+            FSeek(header.resource[0]);
+            struct RESOURCE {
+                char resource[length];
+            } resource <optimize=false>;
+        }
+    } resources;
+} file;
