@@ -28,12 +28,10 @@ struct ARCHIVE {
     FSeek(header.data_offset);
     int offset <format=hex>;
     FSeek(header.data_offset);
-    FSkip(offset);
-    int pad;
     struct DATA {
         struct FILE {
             int length;
             char data[length];
-        } file[13] <optimize=false>;
+        } file[14] <optimize=false>;
     } data;
 } archive;
