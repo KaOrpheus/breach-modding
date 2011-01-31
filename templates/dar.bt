@@ -39,7 +39,7 @@ struct ARCHIVE {
                 struct DESCRIPTOR {
                     STRING group_name;
                     STRING file_name;
-                } descriptors[descriptor_count];
+                } descriptors[descriptor_count] <optimize=false>;
                 total_file_count++;
             } entries[file_count] <optimize=false>;
         } directories[directory_count] <optimize=false>;
