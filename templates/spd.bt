@@ -9,8 +9,43 @@ BigEndian();
 struct FILE {
     struct HEADER {
         char magic[8];
-        int pad; /* Always 0x2C */
-        int pad; /* Always 0 */
+        int constant; // Always 0x2C
+        int constant; // Always 0
         unsigned int resource_count;
+        int pad;
+        int pad;
+        int pad;
+        int pad;
+        int pad;
+        int pad;
     } header;
+    struct BLOCK {
+        int pad;
+        int pad;
+        int pad;
+        int pad;
+        int pad;
+        int pad;
+        int pad;
+        int pad;
+        int pad;
+        int pad;
+        int pad;
+        int pad;
+        int pad;
+        int pad;
+    } block[header.resource_count];
+    local int ptr, i;
+    int ordering[header.resource_count]; /* (resource_count - 1) length list of ints,
+                                          *  may correspond to the ordering within the .psp?
+                                          */
+    int filename_offsets[header.resource_count];
+    ptr = FTell();
+    for (i = 0; i < header.resource_count; i++) {
+        FSeek(ptr);
+        FSkip(filename_offsets[i]);
+        struct FILENAME {
+            string filename;
+        } filename;
+    }
 } file;
