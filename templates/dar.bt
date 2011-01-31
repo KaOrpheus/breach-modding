@@ -20,11 +20,31 @@ struct ARCHIVE {
         int data_offset <format=hex>;
         unsigned int file_length <format=hex>;
     } header;
+
+    local int total_file_count = 0;
+
     FSeek(header.directory_offset);
-/*
- *  Directory entries here.
- *  Haven't worked out a pattern yet
- */
+    struct DIRECTORY_HEADER {
+        int directory_count;
+        struct DIRECTORY {
+            STRING directory_name;
+            int file_count;
+            struct ENTRY {
+                STRING file_name;
+                uint hash;
+                int pad;
+                int data_offset_relative <format=hex>; // relative to start of data
+                int length <format=hex>;
+                int descriptor_count;
+                struct DESCRIPTOR {
+                    STRING group_name;
+                    STRING file_name;
+                } descriptors[descriptor_count];
+                total_file_count++;
+            } entries[file_count] <optimize=false>;
+        } directories[directory_count] <optimize=false>;
+    } directory_header;
+
     FSeek(header.data_offset);
     int offset <format=hex>;
     FSeek(header.data_offset);
@@ -32,6 +52,6 @@ struct ARCHIVE {
         struct FILE {
             int length;
             char data[length];
-        } file[14] <optimize=false>;
+        } file[total_file_count] <optimize=false>;
     } data;
 } archive;
