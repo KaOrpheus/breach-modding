@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <sys/stat.h>
 #include <malloc.h>
 #include <string.h>
 
@@ -55,6 +56,47 @@ char *read_string(FILE *f) {
 	fread(string, len, 1, f);
 	string[len] = 0;
 	return string;
+}
+
+static void _mkdir(const char *dir) {
+	char tmp[256];
+	char *p = NULL;
+	size_t len;
+	snprintf(tmp, sizeof(tmp),"%s",dir);
+	len = strlen(tmp);
+	if(tmp[len - 1] == '\\') {
+		tmp[len - 1] = 0;
+	}
+	for(p = tmp + 1; *p; p++) {
+		if(*p == '\\') {
+			*p = 0;
+			mkdir(tmp, S_IRWXU);
+			*p = '\\';
+		}
+	}
+	mkdir(tmp, S_IRWXU);
+}
+
+void extract_single_file(char *dir, char *filename, FILE *f, uint offset, uint length) {
+	FILE *f2;
+	int dirlen = strlen(dir), filelen = strlen(filename);
+	char *path = (char*)malloc(dirlen + filelen + 2);
+
+	memcpy((char*)(path), dir, dirlen);
+	path[dirlen] = '\\';
+	memcpy((char*)(path + dirlen + 1), filename, filelen);
+	path[dirlen + filelen + 1] = 0;
+
+	_mkdir(dir);
+
+	char *buffer = (char*)malloc(length);
+	fseek(f, offset, SEEK_SET);
+	fread(buffer, length, 1, f);
+	f2 = fopen(path, "w");
+	fwrite(buffer, 1, length, f2);
+	fclose(f2);
+	free(buffer);
+
 }
 
 int main(int argc, char *argv[]) {
@@ -117,6 +159,13 @@ int main(int argc, char *argv[]) {
 			read_int(f, &ent->data_length);
 			read_int(f, &ent->descriptor_count);
 
+			if (list) {
+				long int floc = ftell(f);
+				extract_single_file(dir->directory_name, ent->file_name, f, head.data_offset + ent->data_offset_relative, ent->data_length);
+				printf("after extract\n");
+				fseek(f, floc, SEEK_SET);
+			}
+
 			ent->descriptors = (struct dar_descriptor*)malloc(ent->descriptor_count * sizeof(struct dar_descriptor));
 			for (k = 0; k < ent->descriptor_count; k++) {
 				des = &ent->descriptors[k];
@@ -128,18 +177,9 @@ int main(int argc, char *argv[]) {
 	}
 	
 	if (extract_file) {
-		FILE *f2;
-		int i;
-		char *buffer = (char*)malloc(extract_file->data_length);
-		fseek(f, head.data_offset + extract_file->data_offset_relative, SEEK_SET);
-		i = fread(buffer, extract_file->data_length, 1, f);
-		if (argc > 4)
-			f2 = fopen(argv[4], "w");
-		else
-			f2 = fopen(argv[3], "w");
-		i = fwrite(buffer, 1, extract_file->data_length, f2);
-		fclose(f2);
+		extract_single_file(extract_dir->directory_name, extract_file->file_name, f, head.data_offset + extract_file->data_offset_relative, extract_file->data_length);
 	}
+
 	// TODO: A whole lot of free()ing
 
 
