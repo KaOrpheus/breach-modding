@@ -6,10 +6,10 @@
 struct dar_header {
 	char magic[4];
 	int version;
-	uint directory_offset;
-	uint data_offset_relative;
-	uint data_offset;
-	uint file_length;
+	unsigned int directory_offset;
+	unsigned int data_offset_relative;
+	unsigned int data_offset;
+	unsigned int file_length;
 };
 
 struct dar_descriptor {
@@ -19,26 +19,19 @@ struct dar_descriptor {
 
 struct dar_entry {
 	char *file_name;
-	uint hash;
-	uint unknown;
-	uint data_offset_relative;
-	uint data_length;
-	uint descriptor_count;
+	unsigned int hash;
+	unsigned int unknown;
+	unsigned int data_offset_relative;
+	unsigned int data_length;
+	unsigned int descriptor_count;
 	struct dar_descriptor *descriptors;
 };
 
 struct dar_directory {
 	char *directory_name;
-	uint file_count;
+	unsigned int file_count;
 	struct dar_entry *entries;
 };
-
-inline void endian_swap(unsigned int *x) {
-	*x = (*x>>24) | 
-		((*x<<8) & 0x00FF0000) |
-		((*x>>8) & 0x0000FF00) |
-		(*x<<24);
-}
 
 void read_int(FILE *f, int *i) {
 	fread(i, sizeof(*i), 1, f);
@@ -46,7 +39,7 @@ void read_int(FILE *f, int *i) {
 
 char *read_string(FILE *f) {
 	char *string;
-	uint len;
+	unsigned int len;
 	fread(&len, sizeof(len), 1, f);
 	string = (char*)malloc(len + 1);
 	if (!string) {
@@ -58,11 +51,16 @@ char *read_string(FILE *f) {
 	return string;
 }
 
-static void _mkdir(const char *dir) {
+int max(int a, int b) {
+	return (a>b) ? a : b;
+}
+
+static void mkdir_recursive(const char *dir) {
 	char tmp[256];
 	char *p = NULL;
 	size_t len;
-	snprintf(tmp, sizeof(tmp),"%s",dir);
+	memcpy(tmp, dir, max(strlen(dir), 255));
+	tmp[255] = 0;
 	len = strlen(tmp);
 	if(tmp[len - 1] == '\\') {
 		tmp[len - 1] = 0;
@@ -70,29 +68,37 @@ static void _mkdir(const char *dir) {
 	for(p = tmp + 1; *p; p++) {
 		if(*p == '\\') {
 			*p = 0;
-			mkdir(tmp, S_IRWXU);
+#ifdef _WIN32
+			_mkdir(tmp);
+#else
+			mkdir(tmp, 0744);
+#endif
 			*p = '\\';
 		}
 	}
-	mkdir(tmp, S_IRWXU);
+#ifdef _WIN32
+	_mkdir(tmp);
+#else
+	mkdir(tmp, 0744);
+#endif
 }
 
-void extract_single_file(char *dir, char *filename, FILE *f, uint offset, uint length) {
+void extract_single_file(char *dir, char *filename, FILE *f, unsigned int offset, unsigned int length) {
 	FILE *f2;
 	int dirlen = strlen(dir), filelen = strlen(filename);
 	char *path = (char*)malloc(dirlen + filelen + 2);
+	char *buffer = (char*)malloc(length);
 
 	memcpy((char*)(path), dir, dirlen);
 	path[dirlen] = '\\';
 	memcpy((char*)(path + dirlen + 1), filename, filelen);
 	path[dirlen + filelen + 1] = 0;
 
-	_mkdir(dir);
+	mkdir_recursive(dir);
 
-	char *buffer = (char*)malloc(length);
 	fseek(f, offset, SEEK_SET);
 	fread(buffer, length, 1, f);
-	f2 = fopen(path, "w");
+	f2 = fopen(path, "wb");
 	fwrite(buffer, 1, length, f2);
 	fclose(f2);
 	free(buffer);
@@ -101,11 +107,11 @@ void extract_single_file(char *dir, char *filename, FILE *f, uint offset, uint l
 
 int main(int argc, char *argv[]) {
 	int list = 0;
-	uint i, j, k, len;
+	unsigned int i, j, k, len;
 	FILE *f;
 	struct dar_header head;
 	struct dar_directory *directories;
-	uint directory_count;
+	unsigned int directory_count;
 	struct dar_directory *dir;
 	struct dar_entry *ent;
 	struct dar_descriptor *des;
@@ -121,7 +127,7 @@ int main(int argc, char *argv[]) {
 	if (argc == 2)
 		list = 1;
 
-	f = fopen(argv[1], "r");
+	f = fopen(argv[1], "rb");
 	if (!f) {
 		printf("Could not open '%s'\n", argv[1]);
 		return 1;
@@ -162,7 +168,6 @@ int main(int argc, char *argv[]) {
 			if (list) {
 				long int floc = ftell(f);
 				extract_single_file(dir->directory_name, ent->file_name, f, head.data_offset + ent->data_offset_relative, ent->data_length);
-				printf("after extract\n");
 				fseek(f, floc, SEEK_SET);
 			}
 
