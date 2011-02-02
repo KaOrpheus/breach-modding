@@ -32,9 +32,9 @@ struct ARCHIVE {
             struct ENTRY {
                 STRING file_name;
                 uint hash;
-                int pad;
+                int unknown;
                 int data_offset_relative <format=hex>; // relative to start of data
-                int length <format=hex>;
+                int data_length <format=hex>;
                 int descriptor_count;
                 struct DESCRIPTOR {
                     STRING group_name;
@@ -45,8 +45,6 @@ struct ARCHIVE {
         } directories[directory_count] <optimize=false>;
     } directory_header;
 
-    FSeek(header.data_offset);
-    int offset <format=hex>;
     FSeek(header.data_offset);
     struct DATA {
         struct FILE {
