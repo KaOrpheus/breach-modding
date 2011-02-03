@@ -4,12 +4,15 @@
 // File: dar.bt
 // Author: Mike
 // Purpose: Label breach .dar archive files
-// Notes: Current data length hardcoded for debug.dar
 //--------------------------------------
-struct STRING {
+typedef struct {
     int len;
     char s[len];
-};
+} STRING <read=readbreachstring>;
+
+string readbreachstring(STRING &bs) {
+    return bs.s;
+}
 
 struct ARCHIVE {
     struct HEADER {
