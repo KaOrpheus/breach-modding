@@ -1,0 +1,39 @@
+//--------------------------------------
+//--- 010 Editor v3.1.3 Binary Template
+//
+// File: sct.bt
+// Author: Mike
+// Purpose: Label Breach .sct files
+//--------------------------------------
+typedef struct {
+    int len;
+    char s[len];
+} STRING <read=readbreachstring>;
+
+string readbreachstring(STRING &bs) {
+    return bs.s;
+}
+
+struct FILE {
+    struct HEADER {
+        int pad;
+        int pad;
+        STRING s;
+        STRING s;
+        uint count;
+    } header;
+    struct BLOCK {
+        STRING s;
+        float pad;
+        float pad;
+        float pad;
+        int pad;
+        int pad;
+        float pad;
+        float pad;
+        float pad;
+        float pad;
+        int pad;
+        int pad;
+    } block[header.count] <optimize=false>;
+} file;
