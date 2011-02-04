@@ -11,18 +11,21 @@ struct FILE {
         char magic[8];
         int constant; // Always 0x2C
         int constant; // Always 0
-        unsigned int resource_count;
-        int pad;
-        int pad;
-        int pad;
-        int pad;
-        int pad;
+        uint resource_count;
+        uint blocks_offset <format=hex>;
+        uint blocks_size <format=hex>;
+        uint filenames_offset <format=hex>;
+        uint filenames_size <format=hex>;
+        uint filenames_offset2 <format=hex>;
         int pad;
     } header;
+
+    FSeek(header.blocks_offset);
     struct BLOCK {
         int pad;
         int pad;
         int pad;
+        int sound_id; // Same for both mono and stereo versions of sounds
         int pad;
         int pad;
         int pad;
@@ -33,19 +36,33 @@ struct FILE {
         int pad;
         int pad;
         int pad;
-        int pad;
-    } block[header.resource_count];
-    local int ptr, i;
-    int ordering[header.resource_count]; /* (resource_count - 1) length list of ints,
-                                          *  may correspond to the ordering within the .psp?
-                                          */
-    int filename_offsets[header.resource_count];
-    ptr = FTell();
-    for (i = 0; i < header.resource_count; i++) {
-        FSeek(ptr);
-        FSkip(filename_offsets[i]);
-        struct FILENAME {
-            string filename;
-        } filename;
-    }
+    } block[header.resource_count] <read=readblock>;
+
+    FSeek(header.filenames_offset);
+    struct FILENAMES {
+        local int ptr, i;
+        int something[header.resource_count];
+        int filename_offsets[header.resource_count];
+        ptr = FTell();
+        for (i = 0; i < header.resource_count; i++) {
+            FSeek(ptr);
+            FSkip(filename_offsets[i]);
+            struct FILENAME {
+                string filename;
+            } filename <read=readfilename>;
+        }
+    } filenames;
 } file;
+
+string readfilename(FILENAME &f) {
+    return f.filename;
+}
+
+string readblock(BLOCK &b) {
+    string s;
+    int i;
+    for (i = 0; i < 13; i++) {
+        SPrintf(s, "%s%d - ", s, b.pad[i]);
+    }
+    return s;
+}
