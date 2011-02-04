@@ -62,28 +62,10 @@ l_0_0.OnAddJoinInProgressPlayer = function(l_5_0, l_5_1, l_5_2)
 end
 
 l_0_0.PostStartGame = function(l_6_0)
-  local l_6_1 = new("ScoreEndCondition", l_6_0.scoreLimit)
-  l_6_0:AddEndCondition(l_6_1)
-  local l_6_2 = new("TimeEndCondition", l_6_0.timeLimit)
-  l_6_0:AddEndCondition(l_6_2)
-  local l_6_3, l_6_4 = l_6_0:AddScoringCondition, l_6_0
-  local l_6_5 = new
-  local l_6_6 = "DeathScoringCondition"
-  local l_6_7 = "DM Kill Count"
-  l_6_5 = l_6_5(l_6_6, l_6_7, {teamPunish = true})
-  do
-     -- DECOMPILER ERROR: Confused at declaration of local variable
-
-    l_6_3(l_6_4, l_6_5, l_6_6, l_6_7)
-    l_6_3 = delay
-    l_6_4 = function()
-    l_6_0:HQChatter()
-   end
-    l_6_5 = 10
-    l_6_3(l_6_4, l_6_5)
-  end
-   -- DECOMPILER ERROR: Confused about usage of registers for local variables.
-
+	l_6_0:AddEndCondition(new("ScoreEndCondition", l_6_0.scoreLimit))
+	l_6_0:AddEndCondition(new("TimeEndCondition", l_6_0.timeLimit))
+	l_6_0:AddScoringCondition(l_6_0, new("DeathScoringCondition", "DM Kill Count", {teamPunish = true})) -- Not completely sure on parameters for this one
+	delay(l_6_0:HQChatter(), 10)
 end
 
 l_0_0.Validate = function(l_7_0)
