@@ -1,0 +1,41 @@
+//--------------------------------------
+//--- 010 Editor v3.1.3 Binary Template
+//
+// File: rgp.bt
+// Author: Mike
+// Purpose: Label Breach .rgp files
+//--------------------------------------
+typedef struct {
+    int len;
+    if (len != -1) {
+        char s[len];
+    }
+} STRING <read=readbreachstring>;
+
+string readbreachstring(STRING &bs) {
+    return bs.s;
+}
+
+struct FILE {
+    struct HEADER {
+        int file_length;
+        short pad;
+        short pad;
+        STRING s;
+        STRING s;
+        BYTE pad;
+        int pad;
+        int count;
+        int pad;
+    } header;
+    struct BLOCK {
+        STRING s;
+        int pad;
+        int pad;
+        int pad;
+        STRING s;
+        STRING s;
+        int pad;
+        int pad;
+    } block;
+} file;
