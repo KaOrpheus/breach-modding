@@ -16,7 +16,7 @@ string readbreachstring(STRING &bs) {
     return bs.s;
 }
 
-typedef struct {
+/*typedef struct {
     // There must be a nicer way to do this :|
     byte flag : 1;
     byte flag : 1;
@@ -59,26 +59,28 @@ string readflags(FLAGS &f) {
         SPrintf(ret, "%d%s", f.flag[i], ret); // Note: reversed order!
     }
     return ret;
-}
+}*/
 
 struct FILE {
     struct HEADER {
         int file_length;
-        struct FLAGS flags;
+        float pad;
         STRING type;
         STRING name;
         FSkip(5); // *shrug*
         int count; // maybe?
-        int pad;
     } header;
     struct BLOCK {
-        STRING s;
-        int pad;
-        int pad;
-        struct FLAGS flags;
-        STRING type;
-        STRING name;
-        int pad;
-        int pad;
-    } block;
+        struct BLOCKHEADER {
+            int pad;
+            STRING s;
+            int pad;
+            int size;
+        } header;
+        byte pad[header.size - 4];
+    } block[header.count] <optimize=false, read=readblock>;
 } file;
+
+string readblock(BLOCK &b) {
+    return b.header.s.s;
+}
