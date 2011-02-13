@@ -25,15 +25,20 @@ struct FILE {
         FSkip(5); // *shrug*
         int count;
     } header;
-    struct BLOCK {
-        struct BLOCKHEADER {
-            int pad;
-            STRING s;
-            int pad;
-            int size;
-        } header;
-        byte pad[header.size - 4];
-    } block[header.count] <optimize=false, read=readblock>;
+    local int i, ptr;
+    for (i = 0; i < header.count; i++) {
+        ptr = FTell();
+        struct BLOCK {
+            struct BLOCKHEADER {
+                int pad;
+                STRING s;
+                int pad;
+                int size;
+            } header;
+            byte pad[header.size - 4];
+        } block <optimize=false, read=readblock>;
+        FSeek(ptr + header.size);
+    }
 } file;
 
 string readblock(BLOCK &b) {
