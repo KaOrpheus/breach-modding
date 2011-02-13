@@ -16,51 +16,6 @@ string readbreachstring(STRING &bs) {
     return bs.s;
 }
 
-/*typedef struct {
-    // There must be a nicer way to do this :|
-    byte flag : 1;
-    byte flag : 1;
-    byte flag : 1;
-    byte flag : 1;
-    byte flag : 1;
-    byte flag : 1;
-    byte flag : 1;
-    byte flag : 1;
-    byte flag : 1;
-    byte flag : 1;
-    byte flag : 1;
-    byte flag : 1;
-    byte flag : 1;
-    byte flag : 1;
-    byte flag : 1;
-    byte flag : 1;
-    byte flag : 1;
-    byte flag : 1;
-    byte flag : 1;
-    byte flag : 1;
-    byte flag : 1;
-    byte flag : 1;
-    byte flag : 1;
-    byte flag : 1;
-    byte flag : 1;
-    byte flag : 1;
-    byte flag : 1;
-    byte flag : 1;
-    byte flag : 1;
-    byte flag : 1;
-    byte flag : 1;
-    byte flag : 1;
-} FLAGS <read=readflags>;
-
-string readflags(FLAGS &f) {
-    local int i;
-    local string ret = "";
-    for (i = 0; i < 32; i++) {
-        SPrintf(ret, "%d%s", f.flag[i], ret); // Note: reversed order!
-    }
-    return ret;
-}*/
-
 struct FILE {
     struct HEADER {
         int file_length;
@@ -68,7 +23,7 @@ struct FILE {
         STRING type;
         STRING name;
         FSkip(5); // *shrug*
-        int count; // maybe?
+        int count;
     } header;
     struct BLOCK {
         struct BLOCKHEADER {
