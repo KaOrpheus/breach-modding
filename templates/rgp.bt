@@ -50,7 +50,6 @@ struct FILE {
                     STRING sub;
                     STRING item; 
                     FSkip(size -4 -sub.len -item.len);
-                    //error on block 247, possibly others
                 } else {
                    /* FSkip(61); //temporary! 65(61) for nodes
                     STRING PhysX;
