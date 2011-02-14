@@ -3,6 +3,7 @@
 //
 // File: rgp.bt
 // Author: Mike
+// Editted by: Orpheus
 // Purpose: Label Breach .rgp files
 //--------------------------------------
 typedef struct {
