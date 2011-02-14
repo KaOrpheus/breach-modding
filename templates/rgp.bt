@@ -26,7 +26,7 @@ struct FILE {
         FSkip(5); // *shrug*
         int count;
     } header;
-    local int i, ptr;
+    local int i, ptr,roll=1;
     for (i = 0; i < header.count; i++) {
         struct BLOCK {
             struct BLOCKHEADER {
@@ -43,16 +43,43 @@ struct FILE {
             struct PHYSACTOR {
                 if (header.s.s == "DEBrisTree") {
                     FSkip(69); //temporary! 73(69) for bristree
+                    STRING PhysX;
+                    int pad;
+                    int size;
+                    int pad;
+                    STRING sub;
+                    STRING item; 
+                    FSkip(size -4 -sub.len -item.len);
+                    //error on block 247, possibly others
                 } else {
-                  FSkip(61); //temporary! 65(61) for nodes
+                   /* FSkip(61); //temporary! 65(61) for nodes
+                    STRING PhysX;
+                    int pad;
+                    int size;
+                    int pad;
+                    STRING sub;
+                    STRING item; 
+                    if ((roll ==3) || (roll ==4) || (roll ==6) || (roll==11) || (roll==12) || (roll==14) || (roll==15) || (roll==17)
+                    || (roll==20) || (roll==25) || (roll==26) || (roll==29) || (roll==38) || (roll==39) || (roll==41) || (roll=42) || (roll==43) 
+                    || (roll==44) || (roll==45) || (roll==46) || (roll==47)
+                    ) {
+                    //57 total at 247 blocks, some of the previous blocks are broken
+                    //supposedly im on roll 43... 
+                    // INCOMPLETE commit
+                        FSkip(size -4 -sub.len -item.len);
+                        roll+=1;
+                    }
+                    else {
+                        FSkip(size -3 -sub.len -item.len);
+                        roll+=1;
+                    //does _NOT_ work perfectly.
+                    //issues occur near 200 blocks, I think! haven't check EVERY block, checked sporatically.
+                    }*/
+
                 } 
-                STRING PhysX;
-                int pad;
-                int PhysXSize;
-                int pad;
-                STRING subPhysX;
-                STRING itemPhysX; 
-                
+                //appears to work, and point to the DERENDERABLE 
+                //unfortunatley this is uncheckable until the pointer to dephysx is fixed
+                STRING Renderable;
              } physactor;
 
         } block <optimize=false, read=readblock>;
