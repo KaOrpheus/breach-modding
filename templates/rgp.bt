@@ -3,7 +3,7 @@
 //
 // File: rgp.bt
 // Author: Mike
-// Editted by: Orpheus
+// Edited by: Orpheus
 // Purpose: Label Breach .rgp files
 //--------------------------------------
 typedef struct {
@@ -38,8 +38,23 @@ struct FILE {
                 int pad;
                 STRING sub;
                 STRING item;
+             } header;
+ 
+            struct PHYSACTOR {
+                if (header.s.s == "DEBrisTree") {
+                    FSkip(69); //temporary! 73(69) for bristree
+                } else {
+                  FSkip(61); //temporary! 65(61) for nodes
+                } 
+                STRING PhysX;
+                int pad;
+                int PhysXSize;
+                int pad;
+                STRING subPhysX;
+                STRING itemPhysX; 
+                
+             } physactor;
 
-            } header;
         } block <optimize=false, read=readblock>;
         FSeek(ptr + block.header.size);
     }
