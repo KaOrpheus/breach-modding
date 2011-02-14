@@ -34,6 +34,10 @@ struct FILE {
                 int pad;
                 ptr = FTell();
                 int size;
+                int pad;
+                STRING sub;
+                STRING item;
+
             } header;
         } block <optimize=false, read=readblock>;
         FSeek(ptr + block.header.size);
